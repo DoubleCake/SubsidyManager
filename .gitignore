@@ -1,0 +1,28 @@
+# 特定于我们的项目
+# 数据库文件 - 通常不纳入版本控制
+
+
+# 打包生成的二进制文件
+dist/
+build/
+
+# 虚拟环境
+venv/
+
+# 测试数据
+test_data/
+
+# 开发配置文件
+config_dev.ini
+
+# 日志文件
+*.log
+logs/
+
+# 打包后的可执行文件
+*.exe
+*.spec
+
+# PyInstaller生成的文件
+__pycache__/
+*.pyc

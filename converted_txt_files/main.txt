@@ -1,0 +1,16 @@
+# main.py
+import sys
+from PyQt5.QtWidgets import QApplication
+from ui import FamilySubsidySystem
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    
+    # 设置应用样式
+    app.setStyle("Fusion")
+    
+    # 创建主窗口
+    window = FamilySubsidySystem()
+    window.show()
+    
+    sys.exit(app.exec_())
