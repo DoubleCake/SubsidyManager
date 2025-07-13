@@ -1,5 +1,5 @@
 # services.py
-from dao import FamilyDAO, PersonDAO, LandDAO, SubsidyTypeDAO, SubsidyRecordDAO, ConflictRuleDAO
+from models import FamilyDAO, PersonDAO, LandDAO, SubsidyDAO, SubsidyRecordDAO, ConflictRuleDAO
 from datetime import date
 
 class FamilyService:
@@ -87,7 +87,7 @@ class LandService:
 
 class SubsidyService:
     def __init__(self):
-        self.subsidy_type_dao = SubsidyTypeDAO()
+        self.subsidy_type_dao = SubsidyDAO()
         self.subsidy_record_dao = SubsidyRecordDAO()
         self.conflict_rule_dao = ConflictRuleDAO()
     

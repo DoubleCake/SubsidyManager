@@ -55,6 +55,7 @@ if __name__ == '__main__':
         'venv',
         'utils',  # 比如你不想处理 utils 目录下的 py 文件
         '__pycache__',  # 忽略 Python 缓存目录
+        'PyQt-Fluent-Widgets-PySide6',
     ]
 
     # 把上面的相对路径转换成绝对路径

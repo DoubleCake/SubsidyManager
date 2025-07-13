@@ -2,6 +2,10 @@
 import sqlite3
 import os
 
+# 数据库文件路径（可自定义）
+DB_PATH = "family_subsidies.db"
+
+
 def init_database(db_path='family_subsidies.db'):
     """初始化数据库，创建所有表"""
     conn = sqlite3.connect(db_path)
@@ -101,7 +105,18 @@ def init_database(db_path='family_subsidies.db'):
     conn.commit()
     conn.close()
 
-def execute_query(db_path, query, params=None, fetch=False):
+
+def get_db_connection():
+    """
+    获取数据库连接
+    :return: 数据库连接对象
+    """
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row  # 允许以字典形式访问查询结果
+    return conn
+
+
+def execute_query(db_path, query, params=None, fetch_all=False):
     """执行SQL查询"""
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -112,10 +127,10 @@ def execute_query(db_path, query, params=None, fetch=False):
         else:
             cursor.execute(query)
             
-        if fetch:
+        if fetch_all:
             result = cursor.fetchall()
         else:
-            result = None
+            result = cursor.fetchone()
             
         conn.commit()
         return result

@@ -1,14 +1,9 @@
-# main.py
 import sys
-import os
+from PySide6.QtWidgets import QApplication
+from ui.main_window import MainWindow
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from ui.main_ui import MainUI
-from PyQt5.QtWidgets import QApplication
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    window = MainUI()
+    window = MainWindow()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

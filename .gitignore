@@ -1,7 +1,10 @@
 # 特定于我们的项目
 # 数据库文件 - 通常不纳入版本控制
 
-
+#Fluent测试
+PyQt-Fluent-Widgets-PySide6
+Nonebot-Desktop-Qt-main
+converted_txt_files
 # 打包生成的二进制文件
 dist/
 build/
