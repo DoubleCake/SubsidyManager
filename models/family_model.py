@@ -1,11 +1,6 @@
 # dao/family_dao.py
 from database import execute_query  # 假设这是你的数据库执行函数
 
-
-class FamilyDAO:
-    def __init__(self, db_path='family_subsidies.db'):
-        self.db_path = db_path
-# dao/family_dao.py
 import sqlite3
 
 
@@ -59,6 +54,7 @@ class FamilyDAO:
         JOIN person p ON f.head_id = p.person_id            -- 连接person表，别名为p 连接条件：家庭表中的户主ID等于人员表中的ID
         WHERE f.id = ?               -- 筛选条件：只查询指定ID的家庭
         """
+
         cursor.execute(sql, (family_id,))
         result = cursor.fetchone()
         conn.close()
@@ -111,6 +107,7 @@ class FamilyDAO:
     # dao/family_dao.py
 
     def get_all_families_paginated(self, offset, limit):
+
         """
         获取分页的家庭信息（用于表格显示）
         返回包含家庭ID、土地面积、户主姓名、村名、组号和家庭成员数的完整家庭信息
@@ -121,46 +118,94 @@ class FamilyDAO:
         返回:
             list: 包含家庭信息的字典列表
         """
-        sql = """
+        sql2 = """
             SELECT 
-                f.id AS family_id,
-                f.land_area,
-                p_head.name AS head_name,
-                v.villageName AS village_name,
-                p_head.groupNum AS group_number,
+                f.ID AS family_id,
+                f.land_area AS land_area,
+                COALESCE(p_head.name, '未设置户主') AS head_name,
+                COALESCE(v.village_name, '未知') AS village_name,  -- 修改字段名
+                COALESCE(p_head.groupNum, 0) AS group_number,    -- 修改字段名
                 (
                     SELECT COUNT(*) 
                     FROM person 
-                    WHERE family_id = f.id
+                    WHERE familyid = f.ID
                 ) AS member_count
-            FROM family f   -- 连接户主信息（获取村ID和组号）
-          
-            LEFT JOIN person p_head ON f.head_id = p_head.person_id  -- 通过户主的村ID获取村名
-            LEFT JOIN village v ON p_head.village_id = v.id
-            ORDER BY f.id
+            FROM family f
+            LEFT JOIN person p_head ON f.headid = p_head.ID
+            LEFT JOIN village v ON p_head.villageid = v.ID
+            ORDER BY f.ID 
             LIMIT ? OFFSET ?
         """
-    
+        sql = """    
+        SELECT 
+            f.ID AS family_id,
+            f.land_area,
+            COALESCE(p_head.name, '未设置户主') AS head_name,
+            COALESCE(p_head.phoneNumber, '未设置户主') AS phoneNum,
+            COALESCE(p_head.idcard, '未设置户主') AS head_idcard,
+
+            COALESCE(v.NAME, '未知') AS village_name,
+            COALESCE(p_head.groupNum, 0) AS group_number,
+            (
+                SELECT COUNT(*) 
+                FROM person p_member
+                WHERE p_member.familyid = f.ID
+            ) AS member_count
+        FROM family f
+        LEFT JOIN person p_head ON f.headid = p_head.ID
+        LEFT JOIN village v ON p_head.villageid = v.ID
+        ORDER BY f.ID 
+        LIMIT ? OFFSET ?
+        """ 
+
+        print("执行SQL:\n", sql)
+        print("参数: limit=", limit, "offset=", offset)
         
-        families = execute_query(
-            self.db_path,
-            sql,
-            (limit, offset),
-            fetch_all=True
-        )
+        """检查家庭表数据"""
+        sql2 = "SELECT * FROM family LIMIT 5"
+        families = execute_query(self.db_path, sql2, fetch_all=True)
         
+        print("家庭表前5条记录:")
+        for f in families:
+            print(f)
+
+        try:
+            families = execute_query(
+                self.db_path,
+                sql,
+                (limit, offset),
+                fetch_all=True
+            )
+        except Exception as e:
+            print("查询出错:", str(e))
+            return []
+        
+        print("查询结果:", families)
         # 如果查询结果为 None（没有数据），返回空列表
         if families is None:
             return []
-        
+        elif len(families) == 0:
+            print("查询返回空列表")
+            return []
+        first_family = families[0]
+        print("第一条记录详情:")
+        print(f"family_id: {first_family[0]}")
+        print(f"land_area: {first_family[1]}")
+        print(f"head_name: {first_family[2]}")
+        print(f"village_name: {first_family[3]}")
+        print(f"group_number: {first_family[4]}")
+        print(f"member_count: {first_family[5]}")
+    
         return [
             {
                 "id": family[0],          # family_id
                 "land_area": family[1],    # land_area
                 "head_name": family[2],    # head_name
-                "village_name": family[3], # village_name
-                "group_number": family[4], # group_number
-                "member_count": family[5]  # member_count
+                "head_phone":family[3],    # phoneNum
+                "head_idcard":family[4],    # head_idcard
+                "village_name": family[5], # village_name
+                "group_number": family[6], # group_number
+                "member_count": family[7]  # member_count
             } for family in families
         ]
     
