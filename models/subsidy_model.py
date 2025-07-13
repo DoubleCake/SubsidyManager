@@ -16,7 +16,8 @@ class SubsidyDAO:
             is_mutual_exclusive BOOLEAN DEFAULT 0 -- 是否互斥（布尔值）
         )
     """
-
+    def __init__(self, db_path='family_subsidies.db'):
+        self.db_path = db_path
     def get_all_subsidies(self):
         """
         获取所有补贴类型
