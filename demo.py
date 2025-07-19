@@ -1,98 +1,142 @@
-from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QTableWidget, 
-    QHeaderView, QTableWidgetItem, QPushButton
+from PySide6.QtCore import Qt, QUrl
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
+from qfluentwidgets import (
+    MessageBoxBase,
+    SubtitleLabel,
+    LineEdit,
+    PrimaryPushButton,
+    CaptionLabel,
+    PushButton
 )
-from PySide6.QtCore import Qt
+import logging
+logging.basicConfig(filename='app.log', level=logging.INFO)
 
-class TableDemo(QWidget):
+class SubsidyTypeMessageBox(MessageBoxBase):
+    def __init__(self, parent=None, subsidy_id=None):
+        super().__init__(parent)
+
+        self.titleLabel = SubtitleLabel("补贴类型管理", self)
+        self.subsidy_id = subsidy_id
+
+        # 创建输入控件
+        self.name_edit = LineEdit()
+        self.code_edit = LineEdit()
+        self.land_req_edit = LineEdit()
+
+        self.name_edit.setPlaceholderText("请输入补贴名称")
+        self.code_edit.setPlaceholderText("请输入唯一编码")
+        self.land_req_edit.setPlaceholderText("请输入土地要求")
+
+        self.name_edit.setMinimumHeight(40)
+        self.code_edit.setMinimumHeight(40)
+        self.land_req_edit.setMinimumHeight(40)
+
+        # 错误提示标签
+        self.error_label = CaptionLabel("名称或编码不能为空")
+        self.error_label.setTextColor("#cf1010", Qt.red)
+        self.error_label.hide()
+
+        # 初始化按钮
+        self.save_button = PrimaryPushButton("保存")
+        self.cancel_button = PushButton("取消")
+
+        self.yesButton = self.save_button
+        self.cancelButton = self.cancel_button
+
+        # 连接点击事件（注意：不是直接 connect 到 clicked）
+        self.save_button.clicked.connect(self.onSaveClicked)
+
+        # 布局设置
+        self.setup_ui()
+
+        # 设置窗口大小
+        self.resize(700, 600)
+
+        # 设置标题
+        title = "编辑补贴类型" if subsidy_id else "新建补贴类型"
+        self.titleLabel.setText(title)
+
+    def setup_ui(self):
+        main_layout = QVBoxLayout()
+        main_layout.setSpacing(15)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+
+        self.titleLabel.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(self.titleLabel)
+
+        main_layout.addWidget(QLabel("名称*:"))
+        main_layout.addWidget(self.name_edit)
+
+        main_layout.addWidget(QLabel("编码*:"))
+        main_layout.addWidget(self.code_edit)
+
+        main_layout.addWidget(QLabel("土地要求:"))
+        main_layout.addWidget(self.land_req_edit)
+
+        main_layout.addWidget(self.error_label)
+
+        self.viewLayout.addLayout(main_layout)
+
+    def validate(self):
+        name = self.name_edit.text().strip()
+        code = self.code_edit.text().strip()
+
+        print(f"🔍 [validate] 名称: '{name}', 编码: '{code}'")
+
+        name_valid = bool(name)
+        code_valid = bool(code)
+
+        is_valid = name_valid and code_valid
+        self.error_label.setHidden(is_valid)
+        return is_valid
+
+
+
+    def onSaveClicked(self):
+        logging.warning("onSaveClicked 被调用了！")
+        logging.getLogger().handlers[0].flush()  # 强制刷新缓冲
+        """当用户点击保存按钮时触发"""
+        print("✅ 开始保存数据...")
+        if not self.validate():
+            print("❌ 数据不合法，未保存")
+            return
+
+        print("✅ 数据合法，正在保存")
+        data = {
+            "name": self.name_edit.text(),
+            "code": self.code_edit.text(),
+            "land_requirement": self.land_req_edit.text(),
+        }
+        print("保存内容:", data)
+
+        self.accept()  # 关闭对话框并返回 Accepted
+
+
+class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("表格列宽自适应示例")
+        self.setWindowTitle("补贴管理系统")
         self.resize(800, 600)
-        
-        layout = QVBoxLayout()
+
+        layout = QVBoxLayout(self)
+
+        btn = QPushButton("打开补贴配置窗口")
+        btn.clicked.connect(self.open_dialog)
+        layout.addWidget(btn)
+
         self.setLayout(layout)
-        
-        # 创建表格
-        self.table = QTableWidget()
-        self.table.setColumnCount(6)
-        self.table.setHorizontalHeaderLabels([
-            "家庭ID", "户主名称", "总土地面积", "村", "组", "家庭人数"
-        ])
-        
-        # 设置自适应列宽策略
-        self.setup_column_resizing()
-        
-        # 添加示例数据
-        self.fill_sample_data()
-        
-        # 添加刷新按钮
-        btn_refresh = QPushButton("刷新列宽")
-        btn_refresh.clicked.connect(self.adjust_columns)
-        
-        layout.addWidget(self.table)
-        layout.addWidget(btn_refresh)
-    
-    def setup_column_resizing(self):
-        """设置列宽自适应策略"""
-        header = self.table.horizontalHeader()
-        
-        # 设置默认调整模式
-        header.setSectionResizeMode(QHeaderView.Interactive)
-        
-        # 特定列设置
-        header.setSectionResizeMode(0, QHeaderView.ResizeToContents)  # 家庭ID - 根据内容调整
-        header.setSectionResizeMode(1, QHeaderView.ResizeToContents)  # 户主名称 - 根据内容调整
-        header.setSectionResizeMode(5, QHeaderView.Stretch)           # 家庭人数 - 填充剩余空间
-        
-        # 设置初始列宽
-        self.table.setColumnWidth(2, 150)  # 总土地面积 - 固定宽度
-        self.table.setColumnWidth(3, 120)  # 村 - 固定宽度
-        self.table.setColumnWidth(4, 80)   # 组 - 固定宽度
-    
-    def fill_sample_data(self):
-        """填充示例数据"""
-        sample_data = [
-            [1001, "张三", "1250.75 平方米", "向阳村", 3, 4],
-            [1002, "李四", "980.50 平方米", "幸福村", 5, 3],
-            [1003, "王五", "2100.25 平方米", "光明村", 2, 5],
-            [1004, "赵六", "750.00 平方米", "和平村", 4, 2],
-            [1005, "钱七", "3200.00 平方米", "繁荣村", 1, 6],
-            [1006, "孙八", "1580.30 平方米", "希望村", 6, 4],
-            [1007, "周九", "920.45 平方米", "和谐村", 3, 3],
-            [1008, "吴十", "2850.60 平方米", "富裕村", 2, 5],
-        ]
-        
-        self.table.setRowCount(len(sample_data))
-        
-        for row, data in enumerate(sample_data):
-            for col, value in enumerate(data):
-                item = QTableWidgetItem(str(value))
-                item.setTextAlignment(Qt.AlignCenter)
-                
-                # 特殊处理数值类型
-                if col in [0, 4, 5]:  # ID和数字列
-                    item.setData(Qt.DisplayRole, int(value) if col in [0, 4, 5] else value)
-                
-                self.table.setItem(row, col, item)
-        
-        # 初始调整列宽
-        self.adjust_columns()
-    
-    def adjust_columns(self):
-        """调整列宽以适应内容"""
-        # 对需要自适应的列进行调整
-        for col in [0, 1]:
-            self.table.resizeColumnToContents(col)
-        
-        # 确保表头可见
-        self.table.horizontalHeader().setMinimumSectionSize(50)
-        
-        # 设置最大宽度限制
-        self.table.setColumnWidth(1, min(self.table.columnWidth(1), 200))
+
+    def open_dialog(self):
+        dialog = SubsidyTypeMessageBox(self)
+        if dialog.exec():
+            print("✅ 用户点击了【保存】并成功提交数据")
+            
+        else:
+            print("❌ 用户取消操作或关闭窗口")
+
 
 if __name__ == "__main__":
     app = QApplication([])
-    window = TableDemo()
+    window = MainWindow()
     window.show()
     app.exec()
