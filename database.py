@@ -105,7 +105,6 @@ def init_database(db_path='family_subsidies.db'):
     conn.commit()
     conn.close()
 
-
 def get_db_connection():
     """
     获取数据库连接
@@ -114,7 +113,6 @@ def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row  # 允许以字典形式访问查询结果
     return conn
-
 
 def execute_query(db_path, query, params=None, fetch_all=False):
     """执行SQL查询"""

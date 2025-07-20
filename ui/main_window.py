@@ -5,7 +5,9 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QFont, QIcon, QPixmap
 from qfluentwidgets import (MSFluentWindow, NavigationItemPosition, setTheme, Theme,
                            PrimaryPushButton, LineEdit, InfoBar, InfoBarPosition,
-                           BodyLabel, TitleLabel, FluentIcon, setThemeColor)
+                           BodyLabel, TitleLabel, FluentIcon, setThemeColor,CardWidget)
+from .subsidyManageInterface import SubsidyManagementInterface
+from .familyManageInterface import FamilyManagementInterface
 class SimpleCardWidget(CardWidget):
     """ Simple card widget """
 
@@ -33,7 +35,6 @@ class SimpleCardWidget(CardWidget):
 
         r = self.borderRadius
         painter.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), r, r)
-
 
 class MainWindow(MSFluentWindow):
     """主应用程序窗口"""
@@ -209,25 +210,28 @@ class MainWindow(MSFluentWindow):
         return card
     
     def create_subsidy_interface(self):
+
         """创建补贴管理界面"""
-        widget = QWidget()
-        layout = QVBoxLayout(widget)
-        layout.setContentsMargins(30, 30, 30, 30)
-        layout.setSpacing(20)
-        widget.setObjectName("subsidyInterface")
-        # 标题
-        title_label = TitleLabel("补贴管理")
-        layout.addWidget(title_label)
+        subsidy_interface = SubsidyManagementInterface()
+        # widget = QWidget()
+        # layout = QVBoxLayout(widget)
+        # layout.setContentsMargins(30, 30, 30, 30)
+        # layout.setSpacing(20)
+        # widget.setObjectName("subsidyInterface")
+        # # 标题
+        # title_label = TitleLabel("补贴管理")
+        # layout.addWidget(title_label)
         
-        # 添加内容
-        content = QLabel("补贴管理界面内容...")
-        content.setFont(QFont("Microsoft YaHei", 14))
-        layout.addWidget(content)
+        # # 添加内容
+        # content = QLabel("补贴管理界面内容...")
+        # content.setFont(QFont("Microsoft YaHei", 14))
+        # layout.addWidget(content)
         
-        return widget
+        return subsidy_interface
     
     def create_family_interface(self):
         """创建家庭管理界面"""
+        return FamilyManagementInterface()
         widget = QWidget()
         layout = QVBoxLayout(widget)
         layout.setContentsMargins(30, 30, 30, 30)
