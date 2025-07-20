@@ -2,6 +2,7 @@ import sqlite3
 from datetime import datetime
 from PySide6.QtCore import QDate
 from models.subsidy_model import SubsidyDAO
+
 class SubsidyService:
     def __init__(self, db_path='family_subsidies.db'):
         self.dao = SubsidyDAO(db_path)

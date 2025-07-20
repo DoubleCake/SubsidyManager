@@ -10,14 +10,21 @@ class SubsidyDAO:
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
             name TEXT NOT NULL,  -- 补贴名称
             amount REAL DEFAULT 0, -- 补贴标准/金额
-            year INTEGER, -- 补贴年份
-            description TEXT, -- 详细描述
-            land_type TEXT, -- 针对的土地属性（如耕地、林地、宅基地等）
-            is_mutual_exclusive BOOLEAN DEFAULT 0 -- 是否互斥（布尔值）
+            year INTEGER, -- 补贴时间范围(个别可能是半年一贴)
+            description TEXT, -- 详细描述，说明是什么补贴
+            land_type TEXT, -- 针对的土地属性（如耕地、林地、宅基地，自留地）
+            is_mutual_exclusive BOOLEAN DEFAULT 0 -- 是否互斥（布尔值），即同时期，该补贴会与时间范围重合的补贴，会消耗土地占用。
+            isActivate, --是否激活，如果这个补贴激活，则表示该补贴确实需要使用了。
+            preSubmit,--
+            gChecked,
+            townChecked,
+            isFinished,
+
         )
     """
     def __init__(self, db_path='family_subsidies.db'):
         self.db_path = db_path
+        
     def get_all_subsidies(self):
         """
         获取所有补贴类型

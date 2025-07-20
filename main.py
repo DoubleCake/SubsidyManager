@@ -1,9 +1,10 @@
 import sys
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication
-
-from ui import NewWindow
+from PySide6.QtGui import QFont
+from ui import LoginWindow
 from database import execute_query
+
 def print_database_schema(db_path):
     """打印数据库完整表结构"""
     # 获取所有表名
@@ -43,8 +44,16 @@ def print_database_schema(db_path):
 
 
 if __name__ == "__main__":
+    # 创建应用
     app = QApplication(sys.argv)
-    window = NewWindow()
-    window.show()
+    app.setStyle("Fusion")  # 使用Fusion样式确保跨平台一致性
+    # 设置应用程序字体
+    font = QFont("Microsoft YaHei", 10)
+    app.setFont(font)
+    
+    # 创建登录窗口
+    login_window = LoginWindow()
+    login_window.show()
+    
+    # 运行应用
     sys.exit(app.exec())
-    # print_database_schema("family_subsidies.db")
