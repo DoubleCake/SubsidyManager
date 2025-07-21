@@ -1,0 +1,214 @@
+# dao/family_dao.py
+from database import execute_query  # 假设这是你的数据库执行函数
+
+import sqlite3
+
+
+class FamilyDAO:
+    def __init__(self, db_path='family_subsidies.db'):
+        self.db_path = db_path
+
+    def create_family(self, villageid:int,groupid:int,area: float, ):
+        """
+        创建一个家庭，并为其分配一块新的土地。
+        
+        :param head_id: 户主ID(来自 person 表)
+        :param land_area: 承包土地的面积
+        :return: 新增的家庭ID
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        try:
+            # 插入家庭信息，包含 contract_code
+            cursor.execute(
+                "INSERT INTO family (villageid,groupid,area) VALUES (?, ?)",
+                (villageid,groupid,area)
+            )
+            family_id = cursor.lastrowid
+            conn.commit()
+            return family_id
+
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
+
+    def get_family_by_id(self, family_id: int):
+        """
+        获取家庭详情（包含户主、土地大小、地址、村、组等信息）
+        """
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        sql = """    
+        SELECT 
+            f.ID AS family_id, 
+            f.headid AS head_id,
+            p.name AS head_name,
+            p.phoneNumber AS phone,
+            p.idcard AS idcard,
+            f.land_area,
+            p.address,
+            p.villageid,
+            v.NAME AS village_name,
+            p.groupNum AS group_number,
+            (
+                SELECT COUNT(*) 
+                FROM person p_member
+                WHERE p_member.familyid = f.ID
+            ) AS member_count
+        FROM family f
+        LEFT JOIN person p ON f.headid = p.ID
+        LEFT JOIN village v ON p.villageid = v.ID
+        WHERE f.ID = ?
+        """
+
+        cursor.execute(sql, (family_id,))
+        result = cursor.fetchone()
+        conn.close()
+
+        if not result:
+            return None
+
+        return {
+            'id': result[0],
+            'head_id': result[1],
+            'head_name': result[2],
+            'phone': result[3],
+            'idcard': result[4],
+            'land_area': result[5],
+            'address': result[6] or "未知",
+            'villageid': result[7],
+            'village_name': result[8] or "未知",
+            'group_number': result[9] or 0,
+            'member_count': result[10],
+        }
+
+    def update_family(self, family_id: int, land_area: float):
+        """
+        更新家庭信息（如土地面积）
+        """
+        execute_query(
+            self.db_path,
+            "UPDATE family SET land_area = ? WHERE ID = ?",
+            (land_area, family_id)
+        )
+
+
+    def delete_family(self, family_id: int):
+        """
+        删除一个家庭及其关联数据
+        """
+        # 删除成员和土地关联
+        execute_query(self.db_path, "DELETE FROM family_member WHERE familyid = ?", (family_id,))
+        execute_query(self.db_path, "DELETE FROM family_land WHERE familyid = ?", (family_id,))
+        # 删除家庭本身
+        execute_query(self.db_path, "DELETE FROM family WHERE ID = ?", (family_id,))
+
+    def get_all_families(self):
+        """
+        获取所有家庭的基础信息（用于表格显示）
+        """
+        families = execute_query(
+            self.db_path,
+            "SELECT ID, land_area, headid FROM family",
+            fetch_all=True
+        )
+        return [
+            {"id": f[0], "land_area": f[1], "head_id": f[2]} for f in families
+        ]
+    def get_all_families_paginated(self, offset, limit):
+        """
+        获取分页的家庭信息（用于表格显示）
+        返回包含家庭ID、土地面积、户主姓名、村名、组号和家庭成员数的完整家庭信息
+        参数:
+            offset (int): 起始位置（跳过多少条记录）
+            limit (int): 每页记录数
+            
+        返回:
+            list: 包含家庭信息的字典列表
+        """
+        sql = """    
+        SELECT 
+            f.ID AS family_id,
+            f.land_area,
+            COALESCE(p.name, '未设置户主') AS head_name,
+            COALESCE(p.phoneNumber, '无') AS phone,
+            COALESCE(p.idcard, '无') AS idcard,
+            COALESCE(v.NAME, '未知') AS village_name,
+            COALESCE(p.groupNum, 0) AS group_number,
+            (
+                SELECT COUNT(*) 
+                FROM person p_member
+                WHERE p_member.familyid = f.ID
+            ) AS member_count
+        FROM family f
+        LEFT JOIN person p ON f.headid = p.ID
+        LEFT JOIN village v ON p.villageid = v.ID
+        ORDER BY f.ID 
+        LIMIT ? OFFSET ?
+        """
+
+        print("执行SQL:\n", sql)
+        print("参数: limit=", limit, "offset=", offset)
+
+        try:
+            families = execute_query(
+                self.db_path,
+                sql,
+                (limit, offset),
+                fetch_all=True
+            )
+        except Exception as e:
+            print("查询出错:", str(e))
+            return []
+
+        print("查询结果:", families)
+        if families is None or len(families) == 0:
+            print("查询返回空列表")
+            return []
+
+        return [
+            {
+                "id": family[0],          # family_id
+                "land_area": family[1],    # land_area
+                "head_name": family[2],    # head_name
+                "phone": family[3],        # phone
+                "idcard": family[4],       # idcard
+                "village_name": family[5], # village_name
+                "group_number": family[6], # group_number
+                "member_count": family[7]  # member_count
+            } for family in families
+        ]
+    
+    def search_family(self, keyword: str):
+        """
+        根据关键词搜索家庭（支持户主名、身份证号、电话）
+        """
+        families = execute_query(
+            self.db_path,
+            """
+            SELECT f.ID, f.land_area, COALESCE(p.name, '未设置户主') AS head_name
+            FROM family f
+            LEFT JOIN person p ON f.headid = p.ID
+            WHERE p.name LIKE ? OR p.idcard LIKE ? OR p.phoneNumber LIKE ?
+            """,
+            (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"),
+            fetch_all=True
+        )
+        return [
+            {"id": f[0], "land_area": f[1], "head_name": f[2]} for f in families
+        ]
+
+    def get_total_count(self):
+        """
+        获取家庭总数，用于分页
+        """
+        count = execute_query(
+            self.db_path,
+            "SELECT COUNT(*) FROM family",
+            fetch_one=True
+        )
+        return count[0]
