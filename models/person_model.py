@@ -1,4 +1,4 @@
-from dbManager import DatabaseManager   # 我们的单例
+from .dbManager import DatabaseManager 
 
 class PersonDAO:
     """

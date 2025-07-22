@@ -1,6 +1,5 @@
 # services.py
-from models import FamilyDAO, PersonDAO, LandDAO, SubsidyDAO, SubsidyRecordDAO, ConflictRuleDAO
-from datetime import date
+from models import FamilyDAO, PersonDAO, LandDAO, SubsidyDAO, SubsidyRecordDAO
 
 class FamilyService:
     def __init__(self):

@@ -8,7 +8,7 @@ from .loginUi import LoginWindow
 from .subsidyManageInterface   import SubsidyManagementInterface
 from .familyManageInterface import FamilyManagementInterface
 from .subsidyPopupUi import SubsidyPopup
-
+from .rule_table_page import RuleTablePage
 __all__ = [
     'FamilyManageUI',
     'SubsidyManageUI',
@@ -16,6 +16,7 @@ __all__ = [
     'SubsidyPopup',
     'MainWindow',
     'SubsidyManagementInterface',
-    'FamilyManagementInterface'
-    'NewWindow'  # 确保这里与上面的导入名称一致
+    'FamilyManagementInterface',
+    'NewWindow',  # 确保这里与上面的导入名称一致
+    'RuleTablePage'
 ]

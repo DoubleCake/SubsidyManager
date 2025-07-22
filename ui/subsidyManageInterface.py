@@ -14,7 +14,8 @@ from PySide6.QtCore import QTimer
 import os,sys,shutil
 
 from .subsidyPopupUi import SubsidyPopup
-
+from .rule_list_widget import ConflictRulePage
+from .rule_table_page import RuleTablePage
 class SimpleCardWidget(CardWidget):
     """ Simple card widget """
 
@@ -323,6 +324,10 @@ class SubsidyManagementInterface(QWidget):
         self.create_btn.setIcon(FluentIcon.ADD)
         self.create_btn.setFixedHeight(36)
         toolbar_layout.addWidget(self.create_btn)
+        # 编辑补贴规则
+        self.ruleEditBtn = PrimaryPushButton("补贴规则管理")
+        self.ruleEditBtn.setFixedHeight(36)
+        toolbar_layout.addWidget(self.ruleEditBtn)
         
         # 搜索框
         self.search_box = SearchLineEdit()
@@ -383,10 +388,13 @@ class SubsidyManagementInterface(QWidget):
         # 连接信号
         self.view_toggle.clicked.connect(self.toggle_view)
         self.create_btn.clicked.connect(self.create_subsidy)
+        self.ruleEditBtn.clicked.connect(self.ruleEdit)
         self.status_combo.currentIndexChanged.connect(self.filter_subsidies)
         self.year_combo.currentIndexChanged.connect(self.filter_subsidies)
         self.search_box.textChanged.connect(self.filter_subsidies)
+        
     
+        
     def create_list_view(self):
         """创建列表视图"""
         widget = QWidget()
@@ -666,13 +674,19 @@ class SubsidyManagementInterface(QWidget):
         # 计算弹出窗口位置
         popup_geo = self.popup.geometry()
         popup_geo.moveCenter(main_center)
-        self.popup.move(popup_geo.topLeft())
-        # # 显示创建状态提示
-        # self.state_tooltip = StateToolTip("正在创建补贴", "请稍候...", self.window())
-        # self.state_tooltip.move(self.state_tooltip.getSuitablePos())
-        # self.state_tooltip.show()
-        # # 模拟创建过程
-        # QTimer.singleShot(2000, self.creation_completed)
+ 
+    def ruleEdit(self):
+        self.ruleEditWidget  = RuleTablePage(self)
+    
+        # 在实际应用中，这里会打开创建补贴的对话框
+        self.ruleEditWidget.show()
+        # 居中显示
+        main_geo = self.geometry()
+        main_center = main_geo.center()
+        # 计算弹出窗口位置
+        popup_geo = self.ruleEditWidget.geometry()
+        popup_geo.moveCenter(main_center)
+        # self.popup_geo.move(popup_geo.topLeft())
 
     def filter_subsidies(self):
         """根据筛选条件过滤补贴"""
@@ -929,34 +943,11 @@ class SubsidyManagementInterface(QWidget):
         icon = FluentIcon.LIST if new_index == 0 else FluentIcon.LAYOUT
         self.view_toggle.setIcon(icon)
     
-    
     def filter_subsidies(self):
         """根据筛选条件过滤补贴"""
         # 在实际应用中，这里会连接数据库进行筛选
         print(f"筛选条件: 状态={self.status_combo.currentText()}, 年份={self.year_combo.currentText()}, 搜索={self.search_box.text()}")
-    
-    def create_subsidy(self):
-        """创建新补贴"""
-        # # 在实际应用中，这里会打开创建补贴的对话框
-        print("打开创建补贴对话框")
-        # 在实际应用中，这里会打开创建补贴的对话框
-        self.popup = SubsidyPopup(self)
-        self.popup.show()
-        # 居中显示
-        main_geo = self.geometry()
-        main_center = main_geo.center()
-        # 计算弹出窗口位置
-        popup_geo = self.popup.geometry()
-        popup_geo.moveCenter(main_center)
-        # self.popup.move(popup_geo.topLeft())
-        # # 显示创建状态提示
-        # self.state_tooltip = StateToolTip("正在创建补贴", "请稍候...", self.window())
-        # self.state_tooltip.move(self.state_tooltip.getSuitablePos())
-        # self.state_tooltip.show()
-        
-        # # 模拟创建过程
-        # QTimer.singleShot(2000, self.creation_completed)
-    
+   
     def creation_completed(self):
         """补贴创建完成"""
         self.state_tooltip.setContent("创建成功 ✓")
@@ -990,91 +981,3 @@ class SubsidyManagementInterface(QWidget):
                 position=InfoBarPosition.TOP,
                 duration=3000
             )
-
-# class MainWindow(MSFluentWindow):
-#     """主应用程序窗口"""
-#     def __init__(self):
-#         super().__init__()
-#         self.setWindowTitle("补贴管理系统")
-#         self.resize(1400, 900)
-        
-#         # 设置主题
-#         setTheme(Theme.LIGHT)
-#         setThemeColor("#2b579a")  # 设置主题色为蓝色
-        
-#         # 创建子界面
-#         self.home_interface = self.create_home_interface()
-#         self.home_interface.setObjectName("home_interface") 
-
-#         self.subsidy_interface = SubsidyManagementInterface()
-#         self.subsidy_interface.setObjectName("subsidy_interface") 
-#         self.family_interface = self.create_family_interface()
-#         self.family_interface.setObjectName("family_interface") 
-
-#         self.report_interface = self.create_report_interface()
-#         self.report_interface.setObjectName("report_interface") 
-
-#         self.setting_interface = self.create_setting_interface()
-#         self.setting_interface.setObjectName("setting_interface") 
-
-        
-#         # 添加导航项
-#         self.addSubInterface(self.home_interface, FluentIcon.HOME, "首页")
-#         self.addSubInterface(self.subsidy_interface, FluentIcon.TAG, "补贴管理")
-#         self.addSubInterface(self.family_interface, FluentIcon.PEOPLE, "家庭管理")
-#         self.addSubInterface(self.report_interface, FluentIcon.CHAT, "报表统计")
-        
-#         # 添加设置界面到导航栏底部
-#         self.addSubInterface(self.setting_interface, FluentIcon.SETTING, "系统设置", NavigationItemPosition.BOTTOM)
-        
-#         # 设置初始页面
-#         self.switchTo(self.home_interface)
-        
-#         # 添加导航栏标题
-#         self.navigationInterface.setObjectName("navigationInterface")
-#         self.setStyleSheet("#navigationInterface { border-right: 1px solid #e0e0e0; }")
-    
-#     def create_home_interface(self):
-#         """创建首页界面"""
-#         # 简化实现，实际应用中与之前相同
-#         widget = QWidget()
-#         layout = QVBoxLayout(widget)
-#         layout.addWidget(QLabel("首页内容"))
-#         return widget
-    
-#     def create_family_interface(self):
-#         """创建家庭管理界面"""
-#         widget = QWidget()
-#         layout = QVBoxLayout(widget)
-#         layout.addWidget(QLabel("家庭管理内容"))
-#         return widget
-    
-#     def create_report_interface(self):
-#         """创建报表统计界面"""
-#         widget = QWidget()
-#         layout = QVBoxLayout(widget)
-#         layout.addWidget(QLabel("报表统计内容"))
-#         return widget
-    
-#     def create_setting_interface(self):
-#         """创建系统设置界面"""
-#         widget = QWidget()
-#         layout = QVBoxLayout(widget)
-#         layout.addWidget(QLabel("系统设置内容"))
-#         return widget
-
-if __name__ == "__main__":
-    # 创建应用
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")  # 使用Fusion样式确保跨平台一致性
-    
-    # 设置应用程序字体
-    font = QFont("Microsoft YaHei", 10)
-    app.setFont(font)
-    
-    # 创建主窗口
-    window = MainWindow()
-    window.show()
-    
-    # 运行应用
-    sys.exit(app.exec())

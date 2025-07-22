@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QApplication, QHBoxLayout, QHeaderView, QSizePoli
 
 from qfluentwidgets import ComboBox, LineEdit, PushButton, TableWidget,SubtitleLabel,CardWidget
 from services import SubsidyService 
+
 class SubsidyManageUI(QWidget):
     def __init__(self, text: str, parent=None):
         super().__init__(parent)

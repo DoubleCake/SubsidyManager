@@ -41,8 +41,8 @@
 
 ## 🛠️ 快速开始
 
-1. 下载最新 release 压缩包 → 解压  
-2. 双击 `SubsidyHub.exe`（Windows）或 `SubsidyHub`（macOS / Linux）  
+1. 克隆到本地
+2. 安装虚拟环境即可 
 3. 首次启动 → 初始化数据库 → 开始建村/建组/导数据  
 4. 完成！
 

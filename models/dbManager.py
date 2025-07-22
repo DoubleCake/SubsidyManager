@@ -3,7 +3,7 @@ import sqlite3
 class DatabaseManager:
     _instance = None
 
-    def __new__(cls, db_path='subsidy.db'):
+    def __new__(cls, db_path='family_subsidies.db'):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance.connection = sqlite3.connect(db_path)

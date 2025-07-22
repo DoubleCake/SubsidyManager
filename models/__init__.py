@@ -4,7 +4,6 @@ from .family_model import FamilyDAO
 from .land_model import LandDAO  
 from .villageDao import VillageDAO
 from .subsidy_record_model  import SubsidyRecordDAO
-from .conflict_rule_model import ConflictRuleDAO
 
 __all__ = [
     'SubsidyDAO',
@@ -13,5 +12,4 @@ __all__ = [
     'VillageDAO',
     'FamilyDAO',
     'SubsidyRecordDAO',
-    'ConflictRuleDAO',
 ]

@@ -1,5 +1,5 @@
 # services.py
-from models import FamilyDAO, PersonDAO, LandDAO, SubsidyRecordDAO, ConflictRuleDAO
+from models import FamilyDAO, PersonDAO, LandDAO, SubsidyRecordDAO
 from datetime import date
 from . import FamilyService,SubsidyService
 
