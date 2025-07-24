@@ -1,0 +1,14 @@
+[
+  {
+    "rule_id": "R1",
+    "left": "EDU_B",
+    "right": "EDU_A",
+    "desc": "教育类补贴互斥"
+  },
+  {
+    "rule_id": "R2",
+    "left": "MED_C",
+    "right": "OLD_AGE",
+    "desc": "医疗与养老不可同时享受" 
+  }
+]

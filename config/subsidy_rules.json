@@ -1,0 +1,17 @@
+[
+  {
+    "id": "EDU_A",
+    "name": "义务教育补贴",
+    "land_require": "承包种植地",
+    "amount_per_mu": 150,
+    "max_area": 10,
+    "is_exclusive": false
+  },
+  {
+    "id": "OLD_AGE",
+    "name": "养老补贴",
+    "age_min": 60,
+    "amount_fixed": 1200,
+    "is_exclusive": false
+  }
+]

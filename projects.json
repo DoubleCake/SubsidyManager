@@ -1,0 +1,51 @@
+{
+  "proj_1": {
+    "id": "proj_1",
+    "name": "稻谷任务",
+    "work_folder": "G:/project/SubsidyManager/测试",
+    "excel_file": "G:/project/SubsidyManager/测试/新建 XLSX 工作表.xlsx",
+    "created_time": "2025-07-23T23:26:02.944103",
+    "status": "进行中",
+    "villages": {},
+    "tasks": {}
+  },
+  "proj_2": {
+    "id": "proj_2",
+    "name": "稻谷补贴2",
+    "work_folder": "G:/project/SubsidyManager/测试",
+    "excel_file": "G:/project/SubsidyManager/测试/归档管理模板.xlsx",
+    "created_time": "2025-07-23T23:36:01.175798",
+    "status": "进行中",
+    "villages": {
+      "张村": {
+        "name": "张村",
+        "folder_path": "",
+        "archived": true,
+        "files": [],
+        "archive_time": "2024-01-15 14:30:25"
+      },
+      "王村": {
+        "name": "王村",
+        "folder_path": "",
+        "archived": false,
+        "files": [],
+        "archive_time": "2024-01-16 09:15:30"
+      },
+      "李村": {
+        "name": "李村",
+        "folder_path": "",
+        "archived": false,
+        "files": [],
+        "archive_time": NaN
+      },
+      "赵村": {
+        "name": "赵村",
+        "folder_path": "",
+        "archived": false,
+        "files": [],
+        "archive_time": NaN
+      }
+    },
+    "tasks": {}
+  }
+}
